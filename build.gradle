@@ -1,0 +1,67 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+    id 'java'
+    id 'application'
+}
+
+group 'apple.discord.template'
+version '1.0-SNAPSHOT'
+
+mainClassName = 'apple.template.template.TemplateMain'
+version '1.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor(20, 'seconds')
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
+    implementation 'org.jetbrains:annotations:22.0.0'
+
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.12'
+    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'org.yaml:snakeyaml:1.29'
+
+    // discord JDA
+    implementation "net.dv8tion:JDA:4.3.0_324"
+
+    // utility library
+    implementation 'com.github.amp7368:AppleUtilities:AppleUtilitiesv1.0'
+    // discord gui library
+    implementation 'com.github.amp7368:DiscordACD:DiscordACDv2.2'
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+def filesToCopy = copySpec {
+    from shadowJar.getArchiveFile()
+}
+task shadowJarAndCopy {
+    outputs.upToDateWhen { false }
+    dependsOn(shadowJar)
+    doLast {
+        [outfolder].each { dest ->
+            {
+                copy {
+                    with filesToCopy
+                    into dest
+                }
+            }
+        }
+    }
+}
